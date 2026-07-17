@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Vòng Quay May Mắn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,900;1,600&family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0443fe;
+    --ink-2:#094eef;
+    --ink-3:#0c45ee;
+    --gold:#d4af37;
+    --gold-soft:#f0d891;
+    --ruby:#c1272d;
+    --emerald:#12514f;
+    --cream:#fbf3df;
+    --muted:#fdfdfd;
+    --accent: var(--ruby);
+    --accent-2: var(--emerald);
+    --radius: 18px;
+    --shadow: 0 20px 60px rgba(0,0,0,.45);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    min-height:100vh;
+
+    background-image: url('background sitc.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+
+    color:var(--cream);
+    font-family:'Inter',sans-serif;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    position:relative;
+}
+
+  /* ambient light rays */
+  .rays{
+    position:fixed; inset:0; pointer-events:none; z-index:0;
+    background:
+      conic-gradient(from 0deg at 50% 8%,
+        rgba(212,175,55,.06) 0deg, transparent 14deg,
+        rgba(212,175,55,.06) 22deg, transparent 40deg,
+        rgba(212,175,55,.05) 55deg, transparent 70deg,
+        rgba(212,175,55,.06) 84deg, transparent 100deg,
+        rgba(212,175,55,.05) 120deg, transparent 140deg,
+        rgba(212,175,55,.06) 160deg, transparent 180deg,
+        rgba(212,175,55,.05) 210deg, transparent 230deg,
+        rgba(212,175,55,.06) 250deg, transparent 270deg,
+        rgba(212,175,55,.05) 300deg, transparent 320deg,
+        rgba(212,175,55,.06) 340deg, transparent 360deg);
+    animation: raySwing 18s ease-in-out infinite;
+    mix-blend-mode:screen;
+  }
+  @keyframes raySwing{ 0%,100%{opacity:.7} 50%{opacity:1} }
+
+  .stage{
+    position:relative; z-index:1;
+    min-height:100vh;
+    display:flex; flex-direction:column; align-items:center;
+    padding: clamp(16px,3vw,40px);
+    gap: clamp(10px,2vh,22px);
+  }
+
+  /* ---------- top bar ---------- */
+  .topbar{
+    width:100%; max-width:1100px;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:12px; flex-wrap:wrap;
+  }
+  .brand-name{
+    font-family:'Inter'; font-weight:800; font-size:12px;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--muted);
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+    padding:8px 12px; border-radius:999px; display:flex; align-items:center; gap:8px;
+  }
+  .event-name-input{
+    background:transparent; border:none; color:var(--muted);
+    font-family:'Inter'; font-weight:800; font-size:12px; letter-spacing:.16em;
+    text-transform:uppercase; outline:none; width:auto; min-width:60px;
+  }
+  .event-name-input:focus{color:var(--gold-soft);}
+
+  .toolbar{ display:flex; gap:8px; flex-wrap:wrap; }
+  .icon-btn{
+    width:40px; height:40px; border-radius:12px;
+    border:1px solid rgba(255,255,255,.1);
+    background:rgba(255,255,255,.04);
+    color:var(--cream); cursor:pointer; font-size:17px;
+    display:flex; align-items:center; justify-content:center;
+    transition:.2s ease;
+  }
+  .icon-btn:hover{ background:rgba(255,255,255,.09); transform:translateY(-1px); }
+  .icon-btn.active{ border-color:var(--gold); color:var(--gold-soft); }
+
+  /* ---------- header ---------- */
+  .headline{ text-align:center; margin-top:4px; }
+  .eyebrow{
+    font-size:11px; letter-spacing:.35em; text-transform:uppercase;
+    color:var(--gold-soft); font-weight:700; opacity:.85;
+  }
+  .title{
+    font-family:'Playfair Display', serif; font-weight:900; font-style:italic;
+    font-size:clamp(28px,5vw,52px); margin:6px 0 0;
+    background:linear-gradient(180deg, #ffae00, #ffd800 60%, #ffea02);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow: 0 6px 30px rgb(255, 199, 13);
+  }
+
+  /* ---------- lô tô drum ---------- */
+  .drum-zone{
+    position:relative;
+    width:min(58vh, 74vw, 420px);
+    aspect-ratio:1/1;
+    display:flex; align-items:center; justify-content:center;
+    margin: clamp(4px,1vh,10px) 0;
+  }
+  .drum{
+    position:relative; width:100%; height:100%; border-radius:50%;
+    background:
+      radial-gradient(circle at 32% 26%, rgb(255, 0, 0), rgba(255, 0, 0, 0.987) 55%),
+      radial-gradient(circle, var(--ink-3), var(--ink-2) 78%);
+    border: 4px solid var(--gold);
+        box-shadow: 0 0 0 8px rgb(255, 196, 0), var(--shadow), inset 0 0 50px rgb(255 0 0 / 55%);
+    overflow:hidden;
+  }
+  .drum::before{
+    content:''; position:absolute; inset:8%; border-radius:50%;
+    border:1px dashed rgba(212,175,55,.28); pointer-events:none;
+  }
+  .drum.shaking{ animation: drumShake .12s linear infinite; }
+  @keyframes drumShake{
+    0%{ transform:translate(0,0) rotate(0deg); }
+    25%{ transform:translate(3px,-3px) rotate(1.4deg); }
+    50%{ transform:translate(-3px,3px) rotate(-1.4deg); }
+    75%{ transform:translate(3px,3px) rotate(1.1deg); }
+    100%{ transform:translate(0,0) rotate(0deg); }
+  }
+  .ball{
+    position:absolute; top:0; left:0; border-radius:50%;
+    width:9.5%; height:9.5%;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Anton', sans-serif; font-size:clamp(7px,1.3vw,10px); color:#fff;
+    box-shadow: 0 3px 8px rgba(0,0,0,.45), inset 0 2px 3px rgba(255,255,255,.4);
+    will-change: transform;
+  }
+  .ball.c1{ background: radial-gradient(circle at 30% 25%, #fff, #e53935 55%, #df0000); color:#fff; }
+  .ball.c2{ background: radial-gradient(circle at 30% 25%, #fff, #fdd835 55%, #e3b200); color:#4a3900; }
+  .ball.c3{ background: radial-gradient(circle at 30% 25%, #fff, #1e88e5 55%, #0056ce); color:#fff; }
+
+  /* ---------- CTA ---------- */
+  .cta-wrap{ display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .cta{
+    font-family:'Inter'; font-weight:800; font-size:clamp(16px,2.4vw,22px);
+    letter-spacing:.06em; text-transform:uppercase;
+    color:#000000; cursor:pointer; border:none;
+    padding: 16px 46px; border-radius:999px;
+    background: linear-gradient(180deg, var(--gold-soft), var(--gold) 60%, #ffb700);
+    box-shadow: 0 10px 30px rgba(255, 214, 80, 0.988), inset 0 1px 0 rgb(243, 64, 64);
+    transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+    position:relative;
+  }
+  .cta:hover{ transform:translateY(-2px); box-shadow:0 14px 36px rgba(212,175,55,.5); }
+  .cta:active{ transform:translateY(1px); }
+  .cta:disabled{ filter:grayscale(.5) brightness(.7); cursor:not-allowed; transform:none; }
+  .cta .glow{
+    position:absolute; inset:-6px; border-radius:999px; z-index:-1;
+    background:inherit; filter:blur(16px); opacity:.55;
+  }
+
+  .sub-hint{ font-size:12px; color:var(--muted); letter-spacing:.04em; }
+
+  /* ---------- controls row ---------- */
+  .controls{
+    display:flex; align-items:center; gap:18px; flex-wrap:wrap; justify-content:center;
+    background:rgb(0, 11, 84); border:1px solid rgba(255,255,255,.08);
+    padding:12px 18px; border-radius:999px; backdrop-filter:blur(6px);
+  }
+  .control-group{ display:flex; align-items:center; gap:8px; }
+  .control-label{ font-size:11px; color:var(--muted); letter-spacing:.1em; text-transform:uppercase; }
+  .count-btn{
+    width:32px; height:32px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.04); color:var(--cream); cursor:pointer; font-weight:700;
+    transition:.15s ease;
+  }
+  .count-btn.active{ background:var(--gold); color:#2a1c00; border-color:var(--gold); }
+  .stepper{ display:flex; align-items:center; gap:10px; }
+  .stepper-btn{
+    width:32px; height:32px; border-radius:10px; border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.04); color:var(--cream); cursor:pointer; font-weight:800;
+    font-size:16px; display:flex; align-items:center; justify-content:center;
+    transition:.15s ease;
+  }
+  .stepper-btn:hover{ background:rgba(255,255,255,.1); }
+  .stepper-btn:disabled{ opacity:.35; cursor:not-allowed; }
+  .count-display{
+    min-width:34px; text-align:center; font-family:'Anton'; font-size:20px;
+    color:var(--gold-soft); letter-spacing:.03em;
+  }
+  .swatch{
+    width:22px; height:22px; border-radius:50%; cursor:pointer; border:2px solid rgba(255,255,255,.25);
+    transition:.15s ease;
+  }
+  .swatch.active{ border-color:#fff; transform:scale(1.15); }
+
+  /* ---------- result overlay (centered, middle of screen) ---------- */
+  .result-overlay{
+    position:fixed; inset:0; z-index:70;
+    display:flex; align-items:center; justify-content:center;
+    background:
+      radial-gradient(600px 420px at 50% 42%, rgba(212,175,55,.10), transparent 60%),
+      rgba(5,8,16,.8);
+    backdrop-filter: blur(8px);
+    opacity:0; pointer-events:none;
+    transition: opacity .35s ease;
+    padding: 20px;
+  }
+  .result-overlay.open{ opacity:1; pointer-events:auto; }
+  .result-card{
+    position:relative;
+    background: linear-gradient(180deg, var(--ink-2), var(--ink));
+    border: 1px solid rgba(212,175,55,.4);
+    border-radius: 24px;
+    padding: clamp(28px,5vw,52px) clamp(22px,6vw,60px);
+    box-shadow: 0 30px 90px rgba(0,0,0,.65), inset 0 0 0 1px rgba(212,175,55,.15);
+    transform: scale(.82); opacity:0;
+    transition: transform .4s cubic-bezier(.2,.9,.3,1.2), opacity .3s ease;
+    max-width: min(92vw, 760px);
+    text-align:center;
+  }
+  .result-overlay.open .result-card{ transform: scale(1); opacity:1; }
+  .result-close{ position:absolute; top:14px; right:14px; }
+  .ticket-row{ display:flex; gap:12px; flex-wrap:wrap; justify-content:center; }
+  .ticket{
+    width:clamp(64px,9vw,92px); height:clamp(78px,11vw,112px);
+    background:linear-gradient(180deg,#fff8e6,#f3e2ad);
+    border-radius:10px; position:relative;
+    box-shadow:0 10px 24px rgba(0,0,0,.4), inset 0 0 0 2px rgba(193,39,45,.25);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Anton', sans-serif; font-size:clamp(26px,4.2vw,42px);
+    color:var(--ruby); letter-spacing:.02em;
+    opacity:0; transform:translateY(18px) scale(.85);
+  }
+  .ticket::before, .ticket::after{
+    content:''; position:absolute; width:16px; height:16px; border-radius:50%;
+    background:var(--ink); top:50%; transform:translateY(-50%);
+  }
+  .ticket::before{ left:-8px; } .ticket::after{ right:-8px; }
+  .ticket.show{
+    animation: ticketIn .5s cubic-bezier(.2,.9,.3,1.2) forwards;
+  }
+  @keyframes ticketIn{ to{ opacity:1; transform:translateY(0) scale(1); } }
+  .ticket .digits.rolling{ filter:blur(1px); opacity:.7; }
+
+  .result-title{
+    font-family:'Playfair Display'; font-style:italic; font-weight:800;
+    font-size:clamp(18px,2.6vw,26px); color:var(--gold-soft);
+    text-align:center; margin-bottom:14px;
+  }
+
+  /* ---------- history drawer ---------- */
+  .drawer{
+    position:fixed; top:0; right:0; height:100%; width:min(320px,88vw);
+    background:rgba(10,14,26,.97); border-left:1px solid rgba(255,255,255,.1);
+    transform:translateX(100%); transition:transform .35s ease;
+    z-index:50; padding:20px; overflow-y:auto;
+  }
+  .drawer.open{ transform:translateX(0); }
+  .drawer h3{ font-family:'Playfair Display'; font-style:italic; color:var(--gold-soft); margin-top:0; }
+  .history-item{
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.08);
+    border-radius:10px; padding:10px 12px; margin-bottom:10px; font-size:13px;
+  }
+  .history-item .nums{ font-family:'Anton'; font-size:16px; letter-spacing:.05em; color:var(--gold-soft); }
+  .history-item .time{ color:var(--muted); font-size:11px; margin-top:2px; }
+  .empty-hint{ color:var(--muted); font-size:13px; }
+  .drawer-close{ position:absolute; top:16px; right:16px; }
+
+  canvas#confetti{ position:fixed; inset:0; pointer-events:none; z-index:60; }
+
+  @media (max-width:520px){
+    .controls{ flex-direction:column; gap:12px; border-radius:20px; width:100%; }
+  }
+
+  :focus-visible{ outline:2px solid var(--gold-soft); outline-offset:2px; }
+  @media (prefers-reduced-motion: reduce){
+    .rays, .drum.shaking{ transition-duration:.01ms !important; animation:none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="rays"></div>
+<canvas id="confetti"></canvas>
+
+<div class="stage">
+  <div class="topbar">
+    <div class="brand-name">🎉 <input class="event-name-input" id="eventName" value="COMPANY TRIP"></div>
+    <div class="toolbar">
+      <button class="icon-btn" id="themeBtnDefault" title="Đổi màu thương hiệu">🎨</button>
+      <button class="icon-btn" id="historyBtn" title="Lịch sử quay">🕘</button>
+      <button class="icon-btn" id="fullscreenBtn" title="Toàn màn hình">⛶</button>
+    </div>
+  </div>
+
+  <div class="headline">
+    <div class="eyebrow">Lucky Number Wheel</div>
+    <h1 class="title">Bốc thăm trúng thưởng</h1>
+  </div>
+
+  <div class="drum-zone">
+    <div class="drum" id="drum"></div>
+  </div>
+
+  <div class="cta-wrap">
+    <button class="cta" id="spinBtn"><span class="glow"></span>🎯 QUAY NGAY</button>
+    <div class="sub-hint" id="hint">Chọn số lượng kết quả rồi nhấn quay</div>
+  </div>
+
+  <div class="controls">
+    <div class="control-group">
+      <span class="control-label">Số lượng kết quả</span>
+      <div class="stepper">
+        <button class="stepper-btn" id="countMinus">−</button>
+        <span class="count-display" id="countDisplay">4</span>
+        <button class="stepper-btn" id="countPlus">+</button>
+      </div>
+    </div>
+    <div class="control-group">
+      <span class="control-label">Màu sắc</span>
+      <button class="swatch active" data-theme="hoang-kim" style="background:linear-gradient(135deg,#c1272d,#d4af37)" title="Hoàng Kim"></button>
+      <button class="swatch" data-theme="luc-bao" style="background:linear-gradient(135deg,#12514f,#d4af37)" title="Lục Bảo"></button>
+      <button class="swatch" data-theme="dai-duong" style="background:linear-gradient(135deg,#0d3b66,#4ea8de)" title="Đại Dương"></button>
+      <button class="swatch" data-theme="hoa-long" style="background:linear-gradient(135deg,#7a0c0c,#1a1a1a)" title="Hoả Long"></button>
+    </div>
+  </div>
+</div>
+
+<div class="result-overlay" id="resultOverlay">
+  <div class="result-card">
+    <button class="icon-btn result-close" id="resultClose">✕</button>
+    <div id="resultZone"></div>
+  </div>
+</div>
+
+<div class="drawer" id="drawer">
+  <button class="icon-btn drawer-close" id="drawerClose">✕</button>
+  <h3>Lịch sử quay thưởng</h3>
+  <button class="icon-btn" id="resetDrawBtn" style="width:auto;padding:0 14px;font-size:12px;margin-bottom:14px;">↺ Đặt lại danh sách số</button>
+  <div id="historyList"><div class="empty-hint">Chưa có lượt quay nào trong phiên này.</div></div>
+</div>
+
+<script>
+(function(){
+  const drum = document.getElementById('drum');
+  const spinBtn = document.getElementById('spinBtn');
+  const resultOverlay = document.getElementById('resultOverlay');
+  const resultZone = document.getElementById('resultZone');
+  const hint = document.getElementById('hint');
+  const drawer = document.getElementById('drawer');
+  const historyList = document.getElementById('historyList');
+  const eventNameInput = document.getElementById('eventName');
+
+  document.getElementById('resultClose').addEventListener('click', ()=>{
+    resultOverlay.classList.remove('open');
+  });
+  resultOverlay.addEventListener('click', (e)=>{
+    if(e.target === resultOverlay) resultOverlay.classList.remove('open');
+  });
+
+  function pad2(n){ return n.toString().padStart(2,'0'); }
+  function randomLotoNumber(){ return 1 + Math.floor(Math.random()*54); }
+
+  // ---------- lô tô drum: bouncing balls ----------
+  const BALL_COUNT = 34;
+  let balls = [];
+  function initBalls(){
+    const rect = drum.getBoundingClientRect();
+    const R = rect.width/2;
+    const ballR = rect.width*0.075;
+    for(let i=0;i<BALL_COUNT;i++){
+      const angle = Math.random()*Math.PI*2;
+      const dist = Math.random()*(R-ballR-8);
+      const x = R + Math.cos(angle)*dist;
+      const y = R + Math.sin(angle)*dist;
+      const el = document.createElement('div');
+      el.className = 'ball ' + ['c1','c2','c3'][i%3];
+      el.textContent = pad2(randomLotoNumber());
+      drum.appendChild(el);
+      balls.push({x,y,vx:(Math.random()-0.5)*1.4, vy:(Math.random()-0.5)*1.4, r: ballR, el});
+    }
+  }
+  function updateBalls(speedFactor){
+    const rect = drum.getBoundingClientRect();
+    const R = rect.width/2;
+    balls.forEach(b=>{
+      b.x += b.vx*speedFactor;
+      b.y += b.vy*speedFactor;
+      const dx = b.x-R, dy = b.y-R;
+      const dist = Math.sqrt(dx*dx+dy*dy) || 0.001;
+      if(dist + b.r > R){
+        const nx = dx/dist, ny = dy/dist;
+        const dot = b.vx*nx + b.vy*ny;
+        b.vx -= 2*dot*nx; b.vy -= 2*dot*ny;
+        const overlap = dist + b.r - R;
+        b.x -= nx*overlap; b.y -= ny*overlap;
+      }
+      b.el.style.transform = `translate(${b.x-b.r}px, ${b.y-b.r}px)`;
+    });
+  }
+  let ballSpeed = 0.45; // idle drift speed
+  function ballLoop(){
+    updateBalls(ballSpeed);
+    requestAnimationFrame(ballLoop);
+  }
+  window.addEventListener('load', ()=>{ initBalls(); ballLoop(); });
+
+  let resultCount = 4;
+  let spinning = false;
+  const themes = {
+    'hoang-kim': {a:'#c1272d', b:'#12514f'},
+    'luc-bao':   {a:'#12514f', b:'#c1272d'},
+    'dai-duong': {a:'#0d3b66', b:'#4ea8de'},
+    'hoa-long':  {a:'#7a0c0c', b:'#1a1a1a'}
+  };
+
+  const COUNT_MIN = 1, COUNT_MAX = 10;
+  const countDisplay = document.getElementById('countDisplay');
+  const countMinus = document.getElementById('countMinus');
+  const countPlus = document.getElementById('countPlus');
+  function renderCount(){
+    countDisplay.textContent = resultCount;
+    countMinus.disabled = resultCount <= COUNT_MIN;
+    countPlus.disabled = resultCount >= COUNT_MAX;
+  }
+  countMinus.addEventListener('click', ()=>{
+    if(spinning) return;
+    if(resultCount > COUNT_MIN){ resultCount--; renderCount(); }
+  });
+  countPlus.addEventListener('click', ()=>{
+    if(spinning) return;
+    if(resultCount < COUNT_MAX){ resultCount++; renderCount(); }
+  });
+  renderCount();
+
+  document.querySelectorAll('.swatch').forEach(sw=>{
+    sw.addEventListener('click', ()=>{
+      document.querySelectorAll('.swatch').forEach(s=>s.classList.remove('active'));
+      sw.classList.add('active');
+      const t = themes[sw.dataset.theme];
+      document.documentElement.style.setProperty('--accent', t.a);
+      document.documentElement.style.setProperty('--accent-2', t.b);
+    });
+  });
+
+  // history drawer
+  document.getElementById('historyBtn').addEventListener('click', ()=> drawer.classList.add('open'));
+  document.getElementById('drawerClose').addEventListener('click', ()=> drawer.classList.remove('open'));
+
+  // fullscreen
+  document.getElementById('fullscreenBtn').addEventListener('click', ()=>{
+    if(!document.fullscreenElement){ document.documentElement.requestFullscreen().catch(()=>{}); }
+    else { document.exitFullscreen(); }
+  });
+
+  document.getElementById('themeBtnDefault').addEventListener('click', ()=>{
+    document.querySelectorAll('.swatch')[0].click();
+  });
+
+  // ---------- Web Audio synth sounds (no external files) ----------
+  let audioCtx;
+  function ctx(){ if(!audioCtx) audioCtx = new (window.AudioContext||window.webkitAudioContext)(); return audioCtx; }
+  function tone(freq, start, dur, type='sine', gain=0.15){
+    const ac = ctx();
+    const osc = ac.createOscillator();
+    const g = ac.createGain();
+    osc.type = type; osc.frequency.value = freq;
+    osc.connect(g); g.connect(ac.destination);
+    g.gain.setValueAtTime(gain, ac.currentTime+start);
+    g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime+start+dur);
+    osc.start(ac.currentTime+start);
+    osc.stop(ac.currentTime+start+dur+0.05);
+  }
+  function playSpinSound(duration){
+    const ac = ctx();
+    const ticks = Math.floor(duration*6);
+    for(let i=0;i<ticks;i++){
+      const t = (i/ticks)*duration;
+      const decel = 1 - (i/ticks)*0.6; // slow down feel
+      tone(700*decel, t, 0.04, 'square', 0.05);
+    }
+  }
+  function playWinSound(){
+    [523.25,659.25,783.99,1046.5,1318.5].forEach((f,i)=> tone(f, i*0.11, 0.4, 'triangle', 0.18));
+  }
+  function playCheerSound(){
+    // bright ascending bell sparkle, then a warm resolving chord
+    const sparkle = [659.25, 783.99, 987.77, 1174.66, 1567.98]; // E5 G5 B5 D6 G6
+    sparkle.forEach((f,i)=> tone(f, i*0.09, 0.28, 'triangle', 0.16));
+    const chordAt = sparkle.length*0.09 + 0.05;
+    [1046.5, 1318.5, 1567.98, 2093.0].forEach(f=> tone(f, chordAt, 0.6, 'sine', 0.13));
+  }
+  function playTickSound(){ tone(880, 0, 0.08, 'square', 0.08); }
+
+  // ---------- confetti ----------
+  const canvas = document.getElementById('confetti');
+  const cctx = canvas.getContext('2d');
+  function resizeCanvas(){ canvas.width = innerWidth; canvas.height = innerHeight; }
+  resizeCanvas(); window.addEventListener('resize', resizeCanvas);
+  let confettiPieces = [];
+  const confettiColors = ['#d4af37','#c1272d','#12514f','#fbf3df','#f5a623'];
+  function burstConfetti(count=140){
+    for(let i=0;i<count;i++){
+      confettiPieces.push({
+        x: canvas.width/2 + (Math.random()-0.5)*200,
+        y: canvas.height*0.35 + (Math.random()-0.5)*60,
+        vx: (Math.random()-0.5)*9,
+        vy: Math.random()*-9 - 3,
+        size: 5+Math.random()*6,
+        color: confettiColors[Math.floor(Math.random()*confettiColors.length)],
+        rot: Math.random()*Math.PI*2,
+        vrot: (Math.random()-0.5)*0.3,
+        gravity: 0.22 + Math.random()*0.08,
+        life: 0
+      });
+    }
+    if(!confettiRunning){ confettiRunning = true; requestAnimationFrame(confettiLoop); }
+  }
+  let confettiRunning = false;
+  function confettiLoop(){
+    cctx.clearRect(0,0,canvas.width,canvas.height);
+    confettiPieces.forEach(p=>{
+      p.vy += p.gravity*0.05;
+      p.x += p.vx; p.y += p.vy; p.rot += p.vrot; p.life++;
+      cctx.save();
+      cctx.translate(p.x,p.y); cctx.rotate(p.rot);
+      cctx.fillStyle = p.color;
+      cctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+      cctx.restore();
+    });
+    confettiPieces = confettiPieces.filter(p=> p.y < canvas.height+40 && p.life < 260);
+    if(confettiPieces.length>0){ requestAnimationFrame(confettiLoop); }
+    else { confettiRunning = false; cctx.clearRect(0,0,canvas.width,canvas.height); }
+  }
+
+  // ---------- number generation (no repeats across the whole session) ----------
+  const TOTAL_RANGE = 54;
+  let drawnNumbers = new Set();
+  function remainingCount(){ return TOTAL_RANGE - drawnNumbers.size; }
+  function generateNumbers(count){
+    const available = [];
+    for(let n=1;n<=TOTAL_RANGE;n++){ if(!drawnNumbers.has(n)) available.push(n); }
+    if(available.length < count) return null;
+    // Fisher-Yates shuffle, then take the first `count`
+    for(let i=available.length-1;i>0;i--){
+      const j = Math.floor(Math.random()*(i+1));
+      [available[i],available[j]] = [available[j],available[i]];
+    }
+    const picked = available.slice(0, count);
+    picked.forEach(n=> drawnNumbers.add(n));
+    return picked;
+  }
+  function resetDrawnNumbers(){
+    drawnNumbers.clear();
+    historyList.innerHTML = '<div class="empty-hint">Chưa có lượt quay nào trong phiên này.</div>';
+    hint.textContent = `Đã đặt lại — còn đủ ${TOTAL_RANGE}/${TOTAL_RANGE} số. Nhấn để quay.`;
+  }
+
+  // ---------- reveal sequence with rolling-digit effect ----------
+  function revealResults(numbers){
+    resultZone.innerHTML = '';
+    resultOverlay.classList.add('open');
+    const wrap = document.createElement('div');
+    const title = document.createElement('div');
+    title.className='result-title';
+    title.textContent = '🏆 KẾT QUẢ MAY MẮN';
+    wrap.appendChild(title);
+    const row = document.createElement('div');
+    row.className='ticket-row';
+    wrap.appendChild(row);
+    resultZone.appendChild(wrap);
+
+    const tickets = numbers.map(()=>{
+      const t = document.createElement('div');
+      t.className='ticket';
+      t.textContent = '--';
+      row.appendChild(t);
+      return t;
+    });
+
+    numbers.forEach((finalNum, idx)=>{
+      const t = tickets[idx];
+      setTimeout(()=>{
+        t.classList.add('show');
+        let rolls = 0;
+        const rollInterval = setInterval(()=>{
+          t.textContent = pad2(randomLotoNumber());
+          rolls++;
+          if(rolls > 8){
+            clearInterval(rollInterval);
+            t.textContent = pad2(finalNum);
+            playTickSound();
+          }
+        }, 60);
+      }, idx*260);
+    });
+
+    const totalDelay = numbers.length*260 + 700;
+    setTimeout(()=>{
+      playWinSound();
+      playCheerSound();
+      burstConfetti(160);
+      addHistoryEntry(numbers);
+    }, totalDelay);
+  }
+
+  function addHistoryEntry(numbers){
+    if(historyList.querySelector('.empty-hint')) historyList.innerHTML='';
+    const item = document.createElement('div');
+    item.className='history-item';
+    const now = new Date();
+    const time = now.toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'});
+    item.innerHTML = `<div class="nums">${numbers.map(pad2).join(' - ')}</div><div class="time">${time} · ${eventNameInput.value}</div>`;
+    historyList.prepend(item);
+  }
+
+  document.getElementById('resetDrawBtn').addEventListener('click', ()=>{
+    if(spinning) return;
+    resetDrawnNumbers();
+  });
+
+  // ---------- spin handler (lô tô drum) ----------
+  spinBtn.addEventListener('click', ()=>{
+    if(spinning) return;
+    if(remainingCount() < resultCount){
+      hint.textContent = `Chỉ còn ${remainingCount()}/${TOTAL_RANGE} số chưa quay — hãy giảm số lượng hoặc đặt lại (biểu tượng 🕘).`;
+      return;
+    }
+    spinning = true;
+    spinBtn.disabled = true;
+    spinBtn.textContent = 'ĐANG QUAY...';
+    hint.textContent = 'Lồng cầu đang xáo trộn số may mắn...';
+    resultOverlay.classList.remove('open');
+    resultZone.innerHTML = '';
+
+    const duration = 5; // fixed 6s spin
+    drum.classList.add('shaking');
+    ballSpeed = 5.5; // faster jostle while "spinning"
+    // give each ball a fresh burst of random direction/speed for a more energetic mix
+    balls.forEach(b=>{
+      const a = Math.random()*Math.PI*2;
+      const s = 1.2 + Math.random()*1.3;
+      b.vx = Math.cos(a)*s;
+      b.vy = Math.sin(a)*s;
+    });
+
+    // occasionally re-roll the labels on the balls for a lively flicker
+    const flickerInterval = setInterval(()=>{
+      const b = balls[Math.floor(Math.random()*balls.length)];
+      b.el.textContent = pad2(randomLotoNumber());
+    }, 90);
+
+    playSpinSound(duration);
+
+    // ease the drum down toward the end instead of stopping abruptly
+    setTimeout(()=>{ ballSpeed = 2.4; }, duration*1000*0.7);
+
+    setTimeout(()=>{
+      clearInterval(flickerInterval);
+      drum.classList.remove('shaking');
+      ballSpeed = 0.45;
+      spinning = false;
+      spinBtn.disabled = false;
+      spinBtn.innerHTML = '<span class="glow"></span>🔁 QUAY LẠI';
+      const numbers = generateNumbers(resultCount);
+      if(!numbers){
+        hint.textContent = `Đã hết số khả dụng — hãy đặt lại (biểu tượng 🕘).`;
+        return;
+      }
+      hint.textContent = `Còn lại ${remainingCount()}/${TOTAL_RANGE} số • Nhấn để quay lần tiếp theo`;
+      revealResults(numbers);
+    }, duration*1000 + 60);
+  });
+})();
+</script>
+</body>
+</html>
